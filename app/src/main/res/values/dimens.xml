@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="logo_height">60dp</dimen>
+
+    <dimen name="small_x_margin">4dp</dimen>
+    <dimen name="big_x_margin">65dp</dimen>
+    <dimen name="big_margin">46dp</dimen>
+    <dimen name="small_margin">12dp</dimen>
+    <dimen name="normal_margin">24dp</dimen>
+</resources>

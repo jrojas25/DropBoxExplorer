@@ -1,0 +1,25 @@
+apply plugin: 'java-library'
+apply plugin: 'kotlin'
+apply plugin: 'kotlin-kapt'
+apply from: "$rootProject.projectDir/dependencies.gradle"
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation defaultDeps.kotlin.stdlib
+
+    //Hilt
+    implementation defaultDeps.dagger.hilt.android
+    kapt kaptDeps.dagger.hilt.androidcompiler
+    implementation defaultDeps.dagger.hilt.lifecycle
+    kapt kaptDeps.dagger.hilt.compiler
+
+    //Coroutines
+    implementation defaultDeps.kotlin.coroutines.android
+    implementation defaultDeps.kotlin.coroutines.core
+
+    //Gson
+    implementation defaultDeps.google.gson
+}
+
+sourceCompatibility = "1.7"
+targetCompatibility = "1.7"

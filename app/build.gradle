@@ -1,0 +1,49 @@
+apply plugin: 'com.android.application'
+apply from: "$rootProject.projectDir/shared-gradle.gradle"
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
+apply plugin: 'androidx.navigation.safeargs'
+
+android {
+    viewBinding {
+        enabled = true
+    }
+
+    defaultConfig {
+        applicationId "com.jmr.dropboxbrowser"
+        manifestPlaceholders = [DROPBOX_APP_KEY: "pt7vyapa6wxxgdr"]
+        buildConfigField "String", "DROPBOX_APP_KEY", "\"pt7vyapa6wxxgdr\""
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: "libs", include: ["*.jar"])
+    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+    implementation 'androidx.appcompat:appcompat:1.2.0'
+
+    //arch
+    implementation defaultDeps.arch.lifecycle
+    implementation defaultDeps.arch.activity
+
+    //navigation
+    implementation defaultDeps.androidx.navigation.fragment
+    implementation defaultDeps.androidx.navigation.ui
+
+    //UI
+    implementation defaultDeps.androidx.constraintlayout
+    implementation defaultDeps.androidx.recyclerview
+    implementation defaultDeps.google.material
+
+    //Picasso
+    implementation defaultDeps.picasso
+
+    //Coroutines
+    implementation defaultDeps.kotlin.coroutines.android
+    implementation defaultDeps.kotlin.coroutines.core
+
+    implementation project(":data")
+    implementation project(":domain")
+
+    //Dropbox
+    implementation defaultDeps.dropbox.core
+}

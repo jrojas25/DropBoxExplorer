@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/content_fragment">
+
+    <fragment
+        android:id="@+id/content_fragment"
+        android:name="com.jmr.dropboxbrowser.fragment.BoxContentFragment"
+        android:label="content">
+        <argument
+            android:name="folder"
+            app:argType="string"
+            app:nullable="true"
+            android:defaultValue="@null"/>
+    </fragment>
+
+</navigation>

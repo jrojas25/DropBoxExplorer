@@ -1,0 +1,64 @@
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-kapt'
+apply plugin: 'dagger.hilt.android.plugin'
+apply from: "$rootProject.projectDir/dependencies.gradle"
+
+android {
+    compileSdkVersion 29
+    buildToolsVersion "29.0.3"
+
+    defaultConfig {
+        minSdkVersion 21
+        targetSdkVersion 29
+        versionCode 1
+        versionName "1.0"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        consumerProguardFiles "consumer-rules.pro"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
+}
+
+androidExtensions {
+    experimental = true
+}
+
+dependencies {
+    implementation defaultDeps.kotlin.stdlib
+    implementation 'androidx.core:core-ktx:1.3.2'
+    implementation 'androidx.appcompat:appcompat:1.2.0'
+
+    //Hilt
+    implementation defaultDeps.dagger.hilt.android
+    kapt kaptDeps.dagger.hilt.androidcompiler
+    implementation defaultDeps.dagger.hilt.lifecycle
+    kapt kaptDeps.dagger.hilt.compiler
+
+    // Networking
+    implementation defaultDeps.squareup.retrofit2.converter
+    implementation defaultDeps.squareup.retrofit2.retrofit
+    implementation defaultDeps.squareup.okhttp3.okhttp
+    implementation defaultDeps.squareup.okhttp3.interceptor
+    implementation defaultDeps.google.gson
+
+    // Testing
+    testImplementation testDeps.junit
+    androidTestImplementation testDeps.androidx.junit
+    androidTestImplementation testDeps.androidx.espresso
+}

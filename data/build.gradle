@@ -1,0 +1,20 @@
+apply plugin: 'com.android.library'
+apply from: "$rootProject.projectDir/shared-gradle.gradle"
+
+android{
+    defaultConfig{
+        buildConfigField "String", "BASE_URL", "\"https://api.dropboxapi.com/2/\""
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: "libs", include: ["*.jar"])
+    implementation project(":domain")
+
+    //Security
+    implementation defaultDeps.androidx.security
+    implementation defaultDeps.androidx.coreKtx
+
+    //Dropbox
+    implementation defaultDeps.dropbox.core
+}

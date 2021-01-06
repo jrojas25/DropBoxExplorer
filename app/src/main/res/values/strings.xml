@@ -1,0 +1,16 @@
+<resources>
+    <string name="app_name">DropBox Browser</string>
+    <string name="copyright">© Juan Manuel Rojas Reyes</string>
+
+    <string name="basic_general_error">Oops, something bad happened!</string>
+
+    <string name="login">Login</string>
+    <string name="login_token_error">There was an issue with your login, please try again later.</string>
+
+    <string name="logout">Logout</string>
+
+    <string name="files_no_content">Nothing to see here!</string>
+
+    <string name="permission_request_title">Storage access requested</string>
+    <string name="permission_request_message">Storage access is necessary to download your DropBox files</string>
+</resources>
