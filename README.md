@@ -10,6 +10,7 @@ Min API level is set to `21` to run in most of the devices
   * Kotlin + Coroutines
   * Hilt
   * Retrofit
+  * EncryptedSharedPreferences
   * Jetpack
     * Navigation
     * LiveData
