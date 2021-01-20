@@ -11,12 +11,11 @@ import com.jmr.data.mapper.SingleDropboxFileMapper
 import com.jmr.data.model.FileResponse
 import com.jmr.domain.usecases.DownloadFileUseCase
 import com.jmr.domain.usecases.GetTokenUseCase
+import com.jmr.dropboxbrowser.util.CoroutineSafeCallHandler
 import com.jmr.dropboxbrowser.util.Event
 import com.squareup.picasso.Picasso
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.io.File
-import java.lang.Exception
 
 class NavHostSharedViewModel @ViewModelInject constructor(
     private val dbxRequestConfig: DbxRequestConfig,
@@ -34,16 +33,15 @@ class NavHostSharedViewModel @ViewModelInject constructor(
     fun downloadFile(file: FileResponse) {
         pendingFile = null
         mutableState.value = Event(State.Loading)
-        try {
-            viewModelScope.launch(Dispatchers.IO) {
-                val mFile = downloadFileUseCase(SingleDropboxFileMapper().mapToDomainModel(file))
-                viewModelScope.launch {
-                    mutableState.value = Event(State.FileDownloaded(mFile))
-                }
 
-            }
-        } catch (e: Exception) {
-            mutableState.value = Event(State.Error(e.message))
+        viewModelScope.launch {
+            CoroutineSafeCallHandler.call({
+                downloadFileUseCase(SingleDropboxFileMapper().mapToDomainModel(file))
+            }, {
+                mutableState.value = Event(State.FileDownloaded(it))
+            }, {
+                mutableState.value = Event(State.Error(it.message))
+            })
         }
     }
 

@@ -7,8 +7,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.jmr.domain.usecases.RemoveCredentialsUseCase
 import com.jmr.domain.usecases.RevokeTokenUseCase
+import com.jmr.dropboxbrowser.util.CoroutineSafeCallHandler
 import kotlinx.coroutines.launch
-import java.lang.Exception
 
 class LogoutViewModel @ViewModelInject constructor(
     private val removeCredentialsUseCase: RemoveCredentialsUseCase,
@@ -20,14 +20,16 @@ class LogoutViewModel @ViewModelInject constructor(
 
     fun logUserOut() {
         mutableState.value = State.Loading
-        try {
-            viewModelScope.launch {
+
+        viewModelScope.launch {
+            CoroutineSafeCallHandler.call({
                 revokeTokenUseCase()
                 removeCredentialsUseCase()
+            }, {
                 mutableState.value = State.Success
-            }
-        } catch (e: Exception) {
-            mutableState.value = State.Error(e.message)
+            }, {
+                mutableState.value = State.Error(it.message)
+            })
         }
     }
 

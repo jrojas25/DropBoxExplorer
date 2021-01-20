@@ -8,8 +8,8 @@ import androidx.lifecycle.viewModelScope
 import com.jmr.data.mapper.DropboxFileMapper
 import com.jmr.data.model.DropboxFileList
 import com.jmr.domain.usecases.GetFilesUseCase
+import com.jmr.dropboxbrowser.util.CoroutineSafeCallHandler
 import kotlinx.coroutines.launch
-import java.lang.Exception
 
 class BoxContentViewModel @ViewModelInject constructor(
     private val getFilesUseCase: GetFilesUseCase
@@ -21,15 +21,17 @@ class BoxContentViewModel @ViewModelInject constructor(
 
     fun getBoxContent(folder: String?) {
         mutableState.value = State.Loading
-        try {
-            viewModelScope.launch {
-                mutableState.value =
-                    State.Success(DropboxFileMapper().mapToDataModel(getFilesUseCase(folder)))
-            }
-        } catch (e: Exception) {
-            mutableState.value = State.Error(e.message)
+        viewModelScope.launch {
+            CoroutineSafeCallHandler.call({
+                getFilesUseCase(folder)
+            }, {
+                mutableState.value = State.Success(DropboxFileMapper().mapToDataModel(it))
+            }, {
+                mutableState.value = State.Error(it.message)
+            })
         }
     }
+
 
     sealed class State {
         object Loading : State()

@@ -12,23 +12,12 @@
         android:layout_width="match_parent"
         android:layout_height="@dimen/logo_height"
         android:contentDescription="@null"
-        app:layout_constraintBottom_toTopOf="@id/hourly_logo"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_chainStyle="packed"
         app:srcCompat="@drawable/ic_dropbox_logo" />
-
-    <ImageView
-        android:id="@+id/hourly_logo"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:contentDescription="@null"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/dropbox_logo"
-        app:srcCompat="@drawable/ic_hourly_logo" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/login_button"

@@ -11,15 +11,15 @@
       android:strokeLineJoin="round"
       android:strokeWidth="6"
       android:fillColor="#00000000"
-      android:strokeColor="@color/hourlyBlue"
+      android:strokeColor="@color/colorPrimary"
       android:strokeLineCap="round"/>
   <path
       android:pathData="M79,79H49c0,8.3 6.7,15 15,15S79,87.3 79,79z"
-      android:fillColor="@color/hourlyBlue"/>
+      android:fillColor="@color/colorPrimary"/>
   <path
       android:pathData="M48.6,59m-7.5,0a7.5,7.5 0,1 1,15 0a7.5,7.5 0,1 1,-15 0"
-      android:fillColor="@color/hourlyBlue"/>
+      android:fillColor="@color/colorPrimary"/>
   <path
       android:pathData="M83.1,62h-9c-1.7,0 -3,-1.3 -3,-3s1.3,-3 3,-3h9c1.7,0 3,1.3 3,3S84.7,62 83.1,62z"
-      android:fillColor="@color/hourlyBlue"/>
+      android:fillColor="@color/colorPrimary"/>
 </vector>
