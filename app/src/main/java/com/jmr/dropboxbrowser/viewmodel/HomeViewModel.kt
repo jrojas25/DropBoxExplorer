@@ -17,7 +17,7 @@ import com.squareup.picasso.Picasso
 import kotlinx.coroutines.launch
 import java.io.File
 
-class NavHostSharedViewModel @ViewModelInject constructor(
+class HomeViewModel @ViewModelInject constructor(
     private val dbxRequestConfig: DbxRequestConfig,
     private val getTokenUseCase: GetTokenUseCase,
     private val downloadFileUseCase: DownloadFileUseCase
@@ -32,7 +32,7 @@ class NavHostSharedViewModel @ViewModelInject constructor(
 
     fun downloadFile(file: FileResponse) {
         pendingFile = null
-        mutableState.value = Event(State.Loading)
+        requestLoading()
 
         viewModelScope.launch {
             CoroutineSafeCallHandler.call({
@@ -45,9 +45,18 @@ class NavHostSharedViewModel @ViewModelInject constructor(
         }
     }
 
+    fun displayFolderContent(folder: String?){
+        mutableState.value = Event(State.FolderContent(folder))
+    }
+
+    fun requestLoading(show: Boolean = true) {
+        mutableState.value = Event(State.Loading(show))
+    }
+
     sealed class State {
-        object Loading : State()
+        data class Loading(val show: Boolean) : State()
         data class FileDownloaded(val file: File?) : State()
+        data class FolderContent(val folder: String?) : State()
         data class Error(val errorMessage: String?) : State()
     }
 

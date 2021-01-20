@@ -1,14 +1,14 @@
 package com.jmr.dropboxbrowser.viewmodel
 
+import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.dropbox.core.android.Auth
 import com.jmr.domain.usecases.HasTokenUseCase
 import com.jmr.domain.usecases.SaveTokenUseCase
-import javax.inject.Inject
 
-class LoginViewModel @Inject constructor(
+class LoginViewModel @ViewModelInject constructor(
     private val hasTokenUseCase: HasTokenUseCase,
     private val saveTokenUseCase: SaveTokenUseCase) : ViewModel(){
 

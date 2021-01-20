@@ -2,7 +2,6 @@ package com.jmr.dropboxbrowser.activity
 
 import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
@@ -17,7 +16,7 @@ import com.jmr.dropboxbrowser.R
 import com.jmr.dropboxbrowser.databinding.ActivityHomeBinding
 import com.jmr.dropboxbrowser.util.FileThumbnailRequestHandler
 import com.jmr.dropboxbrowser.viewmodel.LogoutViewModel
-import com.jmr.dropboxbrowser.viewmodel.NavHostSharedViewModel
+import com.jmr.dropboxbrowser.viewmodel.HomeViewModel
 import com.squareup.picasso.OkHttp3Downloader
 import com.squareup.picasso.Picasso
 import dagger.hilt.android.AndroidEntryPoint
@@ -27,7 +26,7 @@ class HomeActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     private lateinit var binding: ActivityHomeBinding
     private val logoutViewModel: LogoutViewModel by viewModels()
-    private val navHostSharedViewModel: NavHostSharedViewModel by viewModels()
+    private val homeViewModel: HomeViewModel by viewModels()
 
     private val navController by lazy {
         Navigation.findNavController(this, R.id.nav_host_fragment)
@@ -41,9 +40,9 @@ class HomeActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         initObserver()
 
-        navHostSharedViewModel.picassoInstance = Picasso.Builder(applicationContext)
+        homeViewModel.picassoInstance = Picasso.Builder(applicationContext)
             .downloader(OkHttp3Downloader(applicationContext))
-            .addRequestHandler(FileThumbnailRequestHandler(navHostSharedViewModel.dbxClientV2))
+            .addRequestHandler(FileThumbnailRequestHandler(homeViewModel.dbxClientV2))
             .build()
 
         binding.navigationView.setNavigationItemSelectedListener(this)
@@ -72,6 +71,19 @@ class HomeActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 }
             }
         })
+
+        homeViewModel.state.observe(this, Observer { state->
+            when(state.peekContent()){
+                is HomeViewModel.State.Loading -> {
+                    if(state.getContentIfNotHandled() as? Boolean? == true){
+                        displayLoading()
+                    }else{
+                        hideLoading()
+                    }
+                }
+                is HomeViewModel.State.FolderContent -> displayFolderContent((state.getContentIfNotHandled() as? HomeViewModel.State.FolderContent?)?.folder)
+            }
+        })
     }
 
     fun displayLoading() {
@@ -88,21 +100,7 @@ class HomeActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         navController.navigate(R.id.content_fragment, bundle)
     }
 
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
-    ) {
-        if (requestCode == REQUEST_CODE_ASK_PERMISSIONS && grantResults.isNotEmpty() && grantResults.firstOrNull() == PackageManager.PERMISSION_GRANTED) {
-            navHostSharedViewModel.pendingFile?.also {
-                navHostSharedViewModel.downloadFile(it)
-            }
-        }
-    }
-
     companion object {
-
-        const val REQUEST_CODE_ASK_PERMISSIONS = 1001
 
         fun start(context: Context) {
             val intent = Intent(context, HomeActivity::class.java).apply {

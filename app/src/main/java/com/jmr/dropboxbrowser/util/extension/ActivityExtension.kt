@@ -1,14 +1,13 @@
 package com.jmr.dropboxbrowser.util.extension
 
-import android.app.Activity
-import android.content.Context
 import android.content.pm.PackageManager
 import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.Fragment
 
-fun Context.showConfirmDialog(title: String, message: String, actionIfAgree: () -> Unit, actionIfDeny: (() -> Unit)?) {
-    val alertDialog = AlertDialog.Builder(this).create()
+fun Fragment.showConfirmDialog(title: String, message: String, actionIfAgree: () -> Unit, actionIfDeny: (() -> Unit)?) {
+    val alertDialog = AlertDialog.Builder(requireContext()).create()
     alertDialog.setTitle(title)
     alertDialog.setMessage(message)
     alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "Cancel") { dialog, _ ->
@@ -22,18 +21,18 @@ fun Context.showConfirmDialog(title: String, message: String, actionIfAgree: () 
     alertDialog.show()
 }
 
-fun Activity.checkAndRequestPermission(
+fun Fragment.checkAndRequestPermission(
     title: String, message: String,
     manifestPermission: String, requestCode: Int,
     actionIfAlreadyApproved: (() -> Unit)? = null,
     actionForLater: (() -> Unit)? = null,
     actionIfRefused: (() -> Unit)? = null
 ) {
-    val permissionStatus = ContextCompat.checkSelfPermission(applicationContext, manifestPermission)
+    val permissionStatus = ContextCompat.checkSelfPermission(requireContext(), manifestPermission)
 
     if (permissionStatus == PackageManager.PERMISSION_DENIED) {
         actionForLater?.invoke()
-        if (ActivityCompat.shouldShowRequestPermissionRationale(this, manifestPermission)) {
+        if (this.shouldShowRequestPermissionRationale(manifestPermission)) {
             this.showConfirmDialog(title, message, {
                 requestPermission(manifestPermission, requestCode)
             }, actionIfRefused )
@@ -46,6 +45,6 @@ fun Activity.checkAndRequestPermission(
     }
 }
 
-fun Activity.requestPermission(manifestPermission: String, requestCode: Int) {
-    ActivityCompat.requestPermissions(this, arrayOf(manifestPermission), requestCode)
+fun Fragment.requestPermission(manifestPermission: String, requestCode: Int) {
+    this.requestPermissions(arrayOf(manifestPermission), requestCode)
 }

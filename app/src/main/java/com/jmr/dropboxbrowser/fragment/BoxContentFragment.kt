@@ -26,7 +26,7 @@ import com.jmr.dropboxbrowser.adapter.DropboxContentAdapter
 import com.jmr.dropboxbrowser.databinding.FragmentBoxContentBinding
 import com.jmr.dropboxbrowser.util.extension.checkAndRequestPermission
 import com.jmr.dropboxbrowser.viewmodel.BoxContentViewModel
-import com.jmr.dropboxbrowser.viewmodel.NavHostSharedViewModel
+import com.jmr.dropboxbrowser.viewmodel.HomeViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import java.io.File
 import javax.inject.Inject
@@ -41,7 +41,7 @@ class BoxContentFragment : Fragment() {
     lateinit var getTokenUseCase: GetTokenUseCase
 
     private val boxContentViewModel: BoxContentViewModel by viewModels()
-    private val navHostSharedViewModel: NavHostSharedViewModel by activityViewModels()
+    private val homeViewModel: HomeViewModel by activityViewModels()
     private val args: BoxContentFragmentArgs by navArgs()
 
     private var _binding: FragmentBoxContentBinding? = null
@@ -77,16 +77,15 @@ class BoxContentFragment : Fragment() {
             }
         })
 
-        navHostSharedViewModel.state.observe(viewLifecycleOwner, Observer { state ->
+        homeViewModel.state.observe(viewLifecycleOwner, Observer { state ->
             when (state.peekContent()) {
-                NavHostSharedViewModel.State.Loading -> (requireActivity() as HomeActivity).displayLoading()
-                is NavHostSharedViewModel.State.FileDownloaded -> {
-                    (requireActivity() as HomeActivity).hideLoading()
-                    openFile((state.getContentIfNotHandled() as? NavHostSharedViewModel.State.FileDownloaded)?.file)
+                is HomeViewModel.State.FileDownloaded -> {
+                    homeViewModel.requestLoading(false)
+                    openFile((state.getContentIfNotHandled() as? HomeViewModel.State.FileDownloaded)?.file)
                 }
-                is NavHostSharedViewModel.State.Error -> {
-                    (requireActivity() as HomeActivity).hideLoading()
-                    displayErrorToast((state.getContentIfNotHandled() as? NavHostSharedViewModel.State.Error)?.errorMessage)
+                is HomeViewModel.State.Error -> {
+                    homeViewModel.requestLoading(false)
+                    displayErrorToast((state.getContentIfNotHandled() as? HomeViewModel.State.Error)?.errorMessage)
                 }
             }
         })
@@ -109,21 +108,20 @@ class BoxContentFragment : Fragment() {
             binding.rvContent.apply {
                 adapter = DropboxContentAdapter(
                     dropboxContent,
-                    navHostSharedViewModel.picassoInstance!!
+                    homeViewModel.picassoInstance!!
                 ) {
                     when (it.tag) {
                         DropboxTypes.FILE.value -> {
-
-                            (requireActivity() as HomeActivity).checkAndRequestPermission(
+                            checkAndRequestPermission(
                                 getString(R.string.permission_request_title),
                                 getString(R.string.permission_request_message),
                                 Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                                HomeActivity.REQUEST_CODE_ASK_PERMISSIONS,
+                                REQUEST_CODE_ASK_PERMISSIONS,
                                 {
-                                    navHostSharedViewModel.downloadFile(it)
+                                    homeViewModel.downloadFile(it)
                                 },
                                 {
-                                    navHostSharedViewModel.pendingFile = it
+                                    homeViewModel.pendingFile = it
                                 },
                                 {
                                     Toast.makeText(
@@ -135,7 +133,7 @@ class BoxContentFragment : Fragment() {
                             )
                         }
                         DropboxTypes.FOLDER.value -> {
-                            (requireActivity() as HomeActivity).displayFolderContent(it.path_display)
+                            homeViewModel.displayFolderContent(it.path_display)
                         }
                     }
                 }
@@ -166,11 +164,29 @@ class BoxContentFragment : Fragment() {
             if (resolveInfo.size > 0) {
                 startActivity(intent)
             }
+        } ?: run {
+            displayErrorToast(null)
+        }
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        if (requestCode == REQUEST_CODE_ASK_PERMISSIONS && grantResults.isNotEmpty() && grantResults.firstOrNull() == PackageManager.PERMISSION_GRANTED) {
+            homeViewModel.pendingFile?.also {
+                homeViewModel.downloadFile(it)
+            }
         }
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    companion object{
+        const val REQUEST_CODE_ASK_PERMISSIONS = 1001
     }
 }
