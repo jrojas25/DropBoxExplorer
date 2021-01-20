@@ -5,27 +5,21 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Toast
+import androidx.activity.viewModels
+import androidx.lifecycle.Observer
 import com.dropbox.core.android.Auth
-import com.jmr.domain.usecases.HasTokenUseCase
-import com.jmr.domain.usecases.SaveTokenUseCase
 import com.jmr.dropboxbrowser.BuildConfig
 import com.jmr.dropboxbrowser.R
 import com.jmr.dropboxbrowser.databinding.ActivityLoginBinding
+import com.jmr.dropboxbrowser.viewmodel.LoginViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class LoginActivity : AppCompatActivity() {
 
-    @Inject
-    lateinit var hasTokenUseCase: HasTokenUseCase
-
-    @Inject
-    lateinit var saveTokenUseCase: SaveTokenUseCase
-
     private lateinit var binding: ActivityLoginBinding
 
-    private var isLoginFlow = false
+    private val loginViewModel: LoginViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,34 +27,31 @@ class LoginActivity : AppCompatActivity() {
         supportActionBar?.hide()
         setContentView(binding.root)
 
+        initObserver()
+
         binding.loginButton.setOnClickListener {
-            isLoginFlow = true
+            loginViewModel.isLoginFlow = true
             Auth.startOAuth2Authentication(this, BuildConfig.DROPBOX_APP_KEY)
         }
     }
 
     override fun onResume() {
         super.onResume()
-        if (!hasTokenUseCase()) {
-            val authToken = Auth.getOAuth2Token()
-            when{
-                !authToken.isNullOrEmpty() && isLoginFlow -> {
-                    saveTokenUseCase(authToken)
-                    isLoginFlow = false
-                    navigateToHome()
-                }
-                authToken.isNullOrEmpty() && isLoginFlow -> {
-                    isLoginFlow = false
-                    Toast.makeText(this, R.string.login_token_error, Toast.LENGTH_SHORT).show()
-                }
+        loginViewModel.checkTokenStatus()
+
+    }
+
+    private fun initObserver() {
+        loginViewModel.state.observe(this, Observer { state ->
+            when(state){
+                LoginViewModel.State.Error -> Toast.makeText(this, R.string.login_token_error, Toast.LENGTH_SHORT).show()
+                LoginViewModel.State.Success -> navigateToHome()
             }
-        } else {
-            navigateToHome()
-        }
+        })
     }
 
     private fun navigateToHome() {
-        NavHostActivity.start(this)
+        HomeActivity.start(this)
         finish()
     }
 

@@ -13,21 +13,19 @@ import androidx.core.os.bundleOf
 import androidx.lifecycle.Observer
 import androidx.navigation.Navigation
 import com.google.android.material.navigation.NavigationView
-import com.jmr.domain.usecases.HasTokenUseCase
 import com.jmr.dropboxbrowser.R
-import com.jmr.dropboxbrowser.databinding.ActivityNavHostBinding
+import com.jmr.dropboxbrowser.databinding.ActivityHomeBinding
 import com.jmr.dropboxbrowser.util.FileThumbnailRequestHandler
 import com.jmr.dropboxbrowser.viewmodel.LogoutViewModel
 import com.jmr.dropboxbrowser.viewmodel.NavHostSharedViewModel
 import com.squareup.picasso.OkHttp3Downloader
 import com.squareup.picasso.Picasso
 import dagger.hilt.android.AndroidEntryPoint
-import javax.inject.Inject
 
 @AndroidEntryPoint
-class NavHostActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
+class HomeActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
 
-    private lateinit var binding: ActivityNavHostBinding
+    private lateinit var binding: ActivityHomeBinding
     private val logoutViewModel: LogoutViewModel by viewModels()
     private val navHostSharedViewModel: NavHostSharedViewModel by viewModels()
 
@@ -36,12 +34,9 @@ class NavHostActivity : AppCompatActivity(), NavigationView.OnNavigationItemSele
     }
     private var folder: String? = null
 
-    @Inject
-    lateinit var hasTokenUseCase: HasTokenUseCase
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityNavHostBinding.inflate(layoutInflater)
+        binding = ActivityHomeBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         initObserver()
@@ -110,7 +105,7 @@ class NavHostActivity : AppCompatActivity(), NavigationView.OnNavigationItemSele
         const val REQUEST_CODE_ASK_PERMISSIONS = 1001
 
         fun start(context: Context) {
-            val intent = Intent(context, NavHostActivity::class.java).apply {
+            val intent = Intent(context, HomeActivity::class.java).apply {
                 addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
             }
             context.startActivity(intent)

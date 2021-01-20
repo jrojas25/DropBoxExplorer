@@ -21,7 +21,7 @@ import com.jmr.data.model.FileResponse
 import com.jmr.domain.model.DropboxTypes
 import com.jmr.domain.usecases.GetTokenUseCase
 import com.jmr.dropboxbrowser.R
-import com.jmr.dropboxbrowser.activity.NavHostActivity
+import com.jmr.dropboxbrowser.activity.HomeActivity
 import com.jmr.dropboxbrowser.adapter.DropboxContentAdapter
 import com.jmr.dropboxbrowser.databinding.FragmentBoxContentBinding
 import com.jmr.dropboxbrowser.util.extension.checkAndRequestPermission
@@ -64,13 +64,13 @@ class BoxContentFragment : Fragment() {
     private fun initObservers() {
         boxContentViewModel.state.observe(viewLifecycleOwner, Observer { state ->
             when (state) {
-                BoxContentViewModel.State.Loading -> (requireActivity() as NavHostActivity).displayLoading()
+                BoxContentViewModel.State.Loading -> (requireActivity() as HomeActivity).displayLoading()
                 is BoxContentViewModel.State.Success -> {
-                    (requireActivity() as NavHostActivity).hideLoading()
+                    (requireActivity() as HomeActivity).hideLoading()
                     populateView(state.files.entries)
                 }
                 is BoxContentViewModel.State.Error -> {
-                    (requireActivity() as NavHostActivity).hideLoading()
+                    (requireActivity() as HomeActivity).hideLoading()
                     displayEmptyFolderMessage()
                     displayErrorToast(state.errorMessage)
                 }
@@ -79,13 +79,13 @@ class BoxContentFragment : Fragment() {
 
         navHostSharedViewModel.state.observe(viewLifecycleOwner, Observer { state ->
             when (state.peekContent()) {
-                NavHostSharedViewModel.State.Loading -> (requireActivity() as NavHostActivity).displayLoading()
+                NavHostSharedViewModel.State.Loading -> (requireActivity() as HomeActivity).displayLoading()
                 is NavHostSharedViewModel.State.FileDownloaded -> {
-                    (requireActivity() as NavHostActivity).hideLoading()
+                    (requireActivity() as HomeActivity).hideLoading()
                     openFile((state.getContentIfNotHandled() as? NavHostSharedViewModel.State.FileDownloaded)?.file)
                 }
                 is NavHostSharedViewModel.State.Error -> {
-                    (requireActivity() as NavHostActivity).hideLoading()
+                    (requireActivity() as HomeActivity).hideLoading()
                     displayErrorToast((state.getContentIfNotHandled() as? NavHostSharedViewModel.State.Error)?.errorMessage)
                 }
             }
@@ -114,11 +114,11 @@ class BoxContentFragment : Fragment() {
                     when (it.tag) {
                         DropboxTypes.FILE.value -> {
 
-                            (requireActivity() as NavHostActivity).checkAndRequestPermission(
+                            (requireActivity() as HomeActivity).checkAndRequestPermission(
                                 getString(R.string.permission_request_title),
                                 getString(R.string.permission_request_message),
                                 Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                                NavHostActivity.REQUEST_CODE_ASK_PERMISSIONS,
+                                HomeActivity.REQUEST_CODE_ASK_PERMISSIONS,
                                 {
                                     navHostSharedViewModel.downloadFile(it)
                                 },
@@ -135,7 +135,7 @@ class BoxContentFragment : Fragment() {
                             )
                         }
                         DropboxTypes.FOLDER.value -> {
-                            (requireActivity() as NavHostActivity).displayFolderContent(it.path_display)
+                            (requireActivity() as HomeActivity).displayFolderContent(it.path_display)
                         }
                     }
                 }
