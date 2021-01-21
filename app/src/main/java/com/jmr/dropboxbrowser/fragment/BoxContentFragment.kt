@@ -7,7 +7,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.webkit.MimeTypeMap
 import android.widget.Toast
 import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
@@ -69,6 +68,7 @@ class BoxContentFragment : Fragment() {
                     (requireActivity() as HomeActivity).hideLoading()
                     populateView(state.files.entries)
                 }
+                is BoxContentViewModel.State.FileIntent -> onFileIntent(state.intent)
                 is BoxContentViewModel.State.Error -> {
                     (requireActivity() as HomeActivity).hideLoading()
                     displayEmptyFolderMessage()
@@ -145,26 +145,23 @@ class BoxContentFragment : Fragment() {
 
     private fun openFile(file: File?) {
         file?.let { result ->
-            val intent = Intent(Intent.ACTION_VIEW)
-            val mime = MimeTypeMap.getSingleton()
-            val ext: String = result.name.substring(result.name.indexOf(".") + 1)
-            val type = mime.getMimeTypeFromExtension(ext)
             val fileUri = FileProvider.getUriForFile(
                 requireContext(),
                 "${requireActivity().applicationContext.packageName}.provider",
                 result
             )
-
-            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-            intent.setDataAndType(fileUri, type)
-
-            val manager: PackageManager = requireActivity().packageManager
-            val resolveInfo =
-                manager.queryIntentActivities(intent, 0)
-            if (resolveInfo.size > 0) {
-                startActivity(intent)
-            }
+            boxContentViewModel.getFileIntent(result.name, fileUri)
         } ?: run {
+            displayErrorToast(null)
+        }
+    }
+
+    private fun onFileIntent(fileIntent: Intent) {
+        val resolveInfo =
+            requireActivity().packageManager.queryIntentActivities(fileIntent, 0)
+        if (resolveInfo.size > 0) {
+            startActivity(fileIntent)
+        } else {
             displayErrorToast(null)
         }
     }
@@ -186,7 +183,7 @@ class BoxContentFragment : Fragment() {
         _binding = null
     }
 
-    companion object{
+    companion object {
         const val REQUEST_CODE_ASK_PERMISSIONS = 1001
     }
 }
