@@ -2,11 +2,15 @@ package com.jmr.dropboxbrowser.util.extension
 
 import android.content.pm.PackageManager
 import androidx.appcompat.app.AlertDialog
-import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 
-fun Fragment.showConfirmDialog(title: String, message: String, actionIfAgree: () -> Unit, actionIfDeny: (() -> Unit)?) {
+fun Fragment.showConfirmDialog(
+    title: String,
+    message: String,
+    actionIfAgree: () -> Unit,
+    actionIfDeny: (() -> Unit)?
+) {
     val alertDialog = AlertDialog.Builder(requireContext()).create()
     alertDialog.setTitle(title)
     alertDialog.setMessage(message)
@@ -35,7 +39,7 @@ fun Fragment.checkAndRequestPermission(
         if (this.shouldShowRequestPermissionRationale(manifestPermission)) {
             this.showConfirmDialog(title, message, {
                 requestPermission(manifestPermission, requestCode)
-            }, actionIfRefused )
+            }, actionIfRefused)
         } else {
             // No explanation needed -> request the permission
             requestPermission(manifestPermission, requestCode)

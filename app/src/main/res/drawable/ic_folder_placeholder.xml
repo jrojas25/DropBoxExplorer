@@ -8,6 +8,6 @@
       android:strokeWidth="0"
       android:fillColor="@android:color/darker_gray"/>
   <path
-      android:fillColor="@color/colorPrimary"
+      android:fillColor="@color/colorPrimaryDark"
       android:pathData="m45,10l-1,0l0,-1a2.9,2.9 0,0 0,-3 -3l-17,0l0,-1a3,3 0,0 0,-3 -3l-18,0a3,3 0,0 0,-3 3l0,40a3,3 0,0 0,3 3l42,0a3,3 0,0 0,3 -3l0,-32a3,3 0,0 0,-3 -3zM24,8l17,0a0.9,0.9 0,0 1,1 1l0,1l-18,0l0,-2zM46,45a1,1 0,0 1,-1 1l-42,0a1,1 0,0 1,-1 -1l0,-40a1,1 0,0 1,1 -1l18,0a1,1 0,0 1,1 1l0,5l-10,0l0,2l33,0a1,1 0,0 1,1 1l0,32z"/>
 </vector>

@@ -7,8 +7,10 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
 import androidx.activity.viewModels
+import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.bundleOf
+import androidx.core.view.GravityCompat
 import androidx.lifecycle.Observer
 import androidx.navigation.Navigation
 import com.google.android.material.navigation.NavigationView
@@ -37,22 +39,24 @@ class HomeActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         super.onCreate(savedInstanceState)
         binding = ActivityHomeBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
+        initView()
         initObserver()
 
         homeViewModel.picassoInstance = Picasso.Builder(applicationContext)
             .downloader(OkHttp3Downloader(applicationContext))
             .addRequestHandler(FileThumbnailRequestHandler(homeViewModel.dbxClientV2))
             .build()
-
-        binding.navigationView.setNavigationItemSelectedListener(this)
     }
 
-    override fun onNavigationItemSelected(item: MenuItem): Boolean {
-        if (item.itemId == R.id.nav_logout) {
-            logoutViewModel.logUserOut()
-        }
-        return true
+    private fun initView() {
+        val toggle =
+            ActionBarDrawerToggle(this, binding.drawerLayout, R.string.app_name, R.string.app_name)
+
+        binding.drawerLayout.addDrawerListener(toggle)
+        toggle.syncState()
+
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        binding.navigationView.setNavigationItemSelectedListener(this)
     }
 
     private fun initObserver() {
@@ -72,12 +76,12 @@ class HomeActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             }
         })
 
-        homeViewModel.state.observe(this, Observer { state->
-            when(state.peekContent()){
+        homeViewModel.state.observe(this, Observer { state ->
+            when (state.peekContent()) {
                 is HomeViewModel.State.Loading -> {
-                    if(state.getContentIfNotHandled() as? Boolean? == true){
+                    if (state.getContentIfNotHandled() as? Boolean? == true) {
                         displayLoading()
-                    }else{
+                    } else {
                         hideLoading()
                     }
                 }
@@ -98,6 +102,35 @@ class HomeActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         this.folder = folder
         val bundle = bundleOf("folder" to folder)
         navController.navigate(R.id.content_fragment, bundle)
+    }
+
+    override fun onNavigationItemSelected(item: MenuItem): Boolean {
+        if (item.itemId == R.id.nav_logout) {
+            logoutViewModel.logUserOut()
+        }
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            android.R.id.home -> {
+                if (binding.drawerLayout.isDrawerOpen(GravityCompat.START)) {
+                    binding.drawerLayout.closeDrawer(GravityCompat.START)
+                } else {
+                    binding.drawerLayout.openDrawer(GravityCompat.START)
+                }
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
+
+    override fun onBackPressed() {
+        if (binding.drawerLayout.isDrawerOpen(GravityCompat.START)) {
+            binding.drawerLayout.closeDrawer(GravityCompat.START)
+        } else {
+            super.onBackPressed()
+        }
     }
 
     companion object {
